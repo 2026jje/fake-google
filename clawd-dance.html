@@ -88,18 +88,18 @@
   @keyframes blink  { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
 
   /* Alternate moves */
-  .clawd.spin { animation: spin 1.2s ease-in-out infinite; }
+  #m-spin:checked   ~ .stage .clawd { animation: spin 1.2s ease-in-out infinite; }
   @keyframes spin {
     0%   { transform: translateY(0) rotateY(0); }
     50%  { transform: translateY(-20%) rotateY(180deg); }
     100% { transform: translateY(0) rotateY(360deg); }
   }
-  .clawd.wiggle { animation: wiggle .3s ease-in-out infinite alternate; }
+  #m-wiggle:checked ~ .stage .clawd { animation: wiggle .3s ease-in-out infinite alternate; }
   @keyframes wiggle {
     from { transform: skewX(-12deg) scaleY(.95); }
     to   { transform: skewX(12deg) scaleY(1.05); }
   }
-  .clawd.hop { animation: hop .6s cubic-bezier(.3, 0, .7, 1) infinite; }
+  #m-hop:checked    ~ .stage .clawd { animation: hop .6s cubic-bezier(.3, 0, .7, 1) infinite; }
   @keyframes hop {
     0%, 100% { transform: translateY(0) scale(1.1, .85); }
     40%      { transform: translateY(-35%) scale(.92, 1.1); }
@@ -121,7 +121,8 @@
 
   h1 { margin: 24px 0 8px; font-size: 22px; letter-spacing: .1em; z-index: 1; }
   .controls { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; padding: 0 16px; z-index: 1; }
-  button {
+  .moves { position: absolute; opacity: 0; pointer-events: none; }
+  .controls label {
     font: inherit;
     padding: 8px 14px;
     border: 2px solid var(--clawd);
@@ -129,8 +130,17 @@
     color: var(--text);
     border-radius: 6px;
     cursor: pointer;
+    user-select: none;
   }
-  button[aria-pressed="true"], button:hover { background: var(--clawd); color: var(--bg); }
+  .controls label:hover,
+  #m-groove:checked ~ .controls [for=m-groove],
+  #m-spin:checked   ~ .controls [for=m-spin],
+  #m-wiggle:checked ~ .controls [for=m-wiggle],
+  #m-hop:checked    ~ .controls [for=m-hop] { background: var(--clawd); color: var(--bg); }
+  #m-groove:focus-visible ~ .controls [for=m-groove],
+  #m-spin:focus-visible   ~ .controls [for=m-spin],
+  #m-wiggle:focus-visible ~ .controls [for=m-wiggle],
+  #m-hop:focus-visible    ~ .controls [for=m-hop] { outline: 2px solid var(--text); outline-offset: 2px; }
 
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: 3s !important; }
@@ -138,6 +148,12 @@
 </style>
 </head>
 <body>
+  <!-- Dance moves are radio buttons so switching works with CSS alone, no JavaScript needed -->
+  <input class="moves" type="radio" name="move" id="m-groove" checked>
+  <input class="moves" type="radio" name="move" id="m-spin">
+  <input class="moves" type="radio" name="move" id="m-wiggle">
+  <input class="moves" type="radio" name="move" id="m-hop">
+
   <div class="lights"></div>
 
   <div class="stage">
@@ -147,7 +163,7 @@
     <span class="note" style="left:20%; bottom:65%; animation-delay:2s">&#9833;</span>
     <span class="note" style="left:70%; bottom:30%; animation-delay:1.5s">&#9836;</span>
 
-    <div class="clawd" id="clawd">
+    <div class="clawd">
       <!-- Clawd, drawn on a 16x12 pixel grid -->
       <svg viewBox="0 0 16 12" shape-rendering="crispEdges" aria-label="Clawd dancing">
         <rect class="arm-l" x="0"  y="4" width="2" height="2" fill="var(--clawd)"/>
@@ -166,20 +182,11 @@
   </div>
 
   <h1>CLAWD IS DANCING</h1>
-  <div class="controls" id="controls">
-    <button data-move="" aria-pressed="true">Groove</button>
-    <button data-move="spin">Spin</button>
-    <button data-move="wiggle">Wiggle</button>
-    <button data-move="hop">Hop</button>
+  <div class="controls">
+    <label for="m-groove">Groove</label>
+    <label for="m-spin">Spin</label>
+    <label for="m-wiggle">Wiggle</label>
+    <label for="m-hop">Hop</label>
   </div>
-
-<script>
-  const clawd = document.getElementById('clawd');
-  const buttons = document.querySelectorAll('#controls button');
-  buttons.forEach(btn => btn.addEventListener('click', () => {
-    clawd.className = 'clawd ' + btn.dataset.move;
-    buttons.forEach(b => b.setAttribute('aria-pressed', b === btn));
-  }));
-</script>
 </body>
 </html>
